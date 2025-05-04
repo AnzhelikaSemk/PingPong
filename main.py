@@ -2,9 +2,10 @@ from pygame import *
 from random import randint
 # подгружаем отдельно функции для работы со шрифтом
 font.init()
-font1 = font.Font(None, 80)
-win = font1.render('YOU WIN!', True, (255, 255, 255))
-lose = font1.render('YOU LOSE!', True, (180, 0, 0))
+font1 = font.SysFont("Arial", 80)
+win1 = font1.render('PLAYER 1 WIN', False, (255, 255, 255))
+
+win2 = font1.render('PLAYER 2 WIN', True, (255, 255, 255))
 
 font2 = font.Font(None, 36)
 
@@ -40,31 +41,37 @@ class GameSprite(sprite.Sprite):
     def reset(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
+speed_x = 5
+speed_y = 5
+
 # класс главного игрока
 class Player(GameSprite):
     # метод для управления спрайтом стрелками клавиатуры
     def update1(self):
         keys = key.get_pressed()
-        if keys[K_w] and self.rect.x > 5:
-            self.rect.x -= self.speed
-        if keys[K_s] and self.rect.x < win_width - 40:
-            self.rect.x += self.speed
+        if keys[K_w] and self.rect.y > 5:
+            self.rect.y -= self.speed
+        if keys[K_s] and self.rect.y < win_width - 40:
+            self.rect.y += self.speed
     def update2(self):
         keys = key.get_pressed()
-        if keys[K_UP] and self.rect.x > 5:
-            self.rect.x -= self.speed
+        if keys[K_UP] and self.rect.y > 5:
+            self.rect.y -= self.speed
         if keys[K_DOWN] and self.rect.x < win_width - 40:
-            self.rect.x += self.speed
+            self.rect.y += self.speed
 
 class Enemy(GameSprite):
     # движение врага
     def update(self):
-        self.rect.y += self.speed
-        self.rect.x += self.speed
+        global speed_x , speed_y
+        self.rect.y += speed_y
+        self.rect.x += speed_x
         global lost
         # исчезает, если дойдет до края экрана
         if self.rect.y > win_height - 40 or self.rect.y < 0:
-            self.speed *= -1
+           speed_y *= -1
+
+
  
  
 win_width = 700
@@ -80,7 +87,13 @@ rocket2 = Player(img_hero, 625, 250, 25, 50, 5)
 finish = False
 run = True 
 while run:
+    if ball.rect.x > 700 :
+        window.blit(win1, (200,200))
+        finish = True
 
+    if ball.rect.x < 0:
+        window.blit(win2, (200,200))
+        finish = True
     for e in event.get():
         if e.type == QUIT:
             run = False
@@ -95,9 +108,15 @@ while run:
         ball.reset()
         ball.update()
         rocket1.reset()
-        rocket1.update()
+        rocket1.update1()
         rocket2.reset()
-        rocket2.update()
+        rocket2.update2()
         display.update()
+
+
+
+
+
+
 
     time.delay(50)
